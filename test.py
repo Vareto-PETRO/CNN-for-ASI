@@ -16,8 +16,8 @@ from data import writeSEGY
 #Parameters
 dataset_name = 'F3'
 subsampl = 16 #We only evaluate every n-th point
-im_size = 65
-use_gpu = True #Switch to toggle the use of GPU or not
+image_size = 65
+device_name = torch.device("cuda:2" if torch.cuda.is_available() else "cpu")
 log_tensorboard = True
 
 #Read 3D cube
@@ -26,8 +26,7 @@ data, data_info = readSEGY(join(dataset_name, 'data.segy'))
 #Load trained model (run train.py to create trained
 network = TextureNet(n_classes=2)
 network.load_state_dict(torch.load(join('F3', 'saved_model.pt')))
-if use_gpu: 
-  network = network.cuda()
+network = network.to(device_name)
 network.eval()
 
 # We can set the interpretation resolution to save time.
@@ -44,24 +43,24 @@ logger.log_images(slice+'_' + str(slice_no), get_slice(data, data_info, slice, s
 
 """ Plot extracted features, class probabilities and salt-predictions for slice """
 #features (attributes) from layer 5
-im  = interpret( network.f5, data, data_info, slice, slice_no, im_size, resolution, use_gpu=use_gpu)
+im  = interpret( network.f5, data, data_info, slice, slice_no, image_size, resolution, device=device_name)
 logger.log_images(slice+'_' + str(slice_no)+' _f5', im)
 
 #features from layer 4
-im  = interpret( network.f4, data, data_info, slice, slice_no, im_size, resolution, use_gpu=use_gpu)
+im  = interpret( network.f4, data, data_info, slice, slice_no, image_size, resolution, device=device_name)
 logger.log_images(slice+'_' + str(slice_no) +' _f4', im)
 
 #Class "probabilities"
-im  = interpret( network, data, data_info, slice, slice_no, im_size, resolution, use_gpu=use_gpu)
+im  = interpret( network, data, data_info, slice, slice_no, image_size, resolution, device=device_name)
 logger.log_images(slice+'_' + str(slice_no) + '_class_prob', im)
 
 #Class
-im  = interpret( network.classify, data, data_info, slice, slice_no, im_size, resolution, use_gpu=use_gpu)
+im  = interpret( network.classify, data, data_info, slice, slice_no, image_size, resolution, device=device_name)
 logger.log_images(slice+'_' + str(slice_no) + '_class', im)
 
 
 """ Make interpretation for full cube and save to SEGY file """
-classified_cube  = interpret( network.classify, data, data_info, 'full', None, im_size, 32, use_gpu=use_gpu)
+classified_cube  = interpret( network.classify, data, data_info, 'full', None, image_size, 32, device=device_name)
 in_file = join(dataset_name, 'data.segy')
 out_file = join(dataset_name, 'salt.segy')
 writeSEGY(out_file, in_file, classified_cube)

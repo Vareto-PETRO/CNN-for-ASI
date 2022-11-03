@@ -6,7 +6,7 @@ import numpy as np
 from torch.autograd import Variable
 from scipy.interpolate import interpn
 
-def interpret( network, data, data_info, slice, slice_no, im_size, subsampl, return_full_size=True, use_gpu=True):
+def interpret( network, data, data_info, slice, slice_no, im_size, subsampl, return_full_size=True, device='cpu'):
     # Wrap np.linspace in compact function call
     def ls(N):  return np.linspace(0, N - 1, N, dtype='int')
 
@@ -79,8 +79,7 @@ def interpret( network, data, data_info, slice, slice_no, im_size, subsampl, ret
             mini_cube = data[X0-w:X0+w+ 1, X1-w:X1+w+ 1, X2-w:X2+w+ 1]
 
             #Get predicted "probabilities"
-            mini_cube = Variable( torch.FloatTensor(mini_cube[np.newaxis,np.newaxis,:,:,:]) )
-            if use_gpu: mini_cube = mini_cube.cuda()
+            mini_cube = Variable( torch.FloatTensor(mini_cube[np.newaxis,np.newaxis,:,:,:]) ).to(device)
             out = network(mini_cube)
             out = out.data.cpu().numpy()
 

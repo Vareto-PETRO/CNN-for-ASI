@@ -2,8 +2,8 @@
 from __future__ import print_function
 from os.path import isfile, join
 
+import os
 import segyio
-from os import listdir
 import numpy as np
 import scipy.misc
 
@@ -73,7 +73,7 @@ timeslice_alias = ['timeslice','time-slice','t','z','depthslice','depth']
 
 # Read labels from an image
 def readLabels(foldername, data_info):
-    files = [f for f in listdir(foldername) if isfile(join(foldername, f))]
+    files = [f for f in os.listdir(foldername) if isfile(join(foldername, f))]
 
     label_imgs = []
     label_coordinates = {}
