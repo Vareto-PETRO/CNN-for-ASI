@@ -17,7 +17,7 @@ from utils import computeAccuracy, interpret, var_to_np
 
 # Parameters
 dataset_name = 'F3'
-device_name = torch.device("cuda:2" if torch.cuda.is_available() else "cpu")
+device_name = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 image_size = 65
 batch_size = 32 #If you have a GPU with little memory, try reducing this to 16 (may degrade results)
 log_tensorboard = True #Log progress on tensor board

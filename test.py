@@ -17,7 +17,7 @@ from data import writeSEGY
 dataset_name = 'F3'
 subsampl = 16 #We only evaluate every n-th point
 image_size = 65
-device_name = torch.device("cuda:2" if torch.cuda.is_available() else "cpu")
+device_name = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 log_tensorboard = True
 
 #Read 3D cube
